@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 UART_HandleTypeDef huart1;
-extern SPI_HandleTypeDef  spi1;
+SPI_HandleTypeDef spi1;
 
 int main(){
     HAL_Init();

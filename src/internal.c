@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 extern UART_HandleTypeDef huart1;
-extern SPI_HandleTypeDef  spi1;
+extern SPI_HandleTypeDef spi1;
 
 void setup_hardfault_led(void){
     GPIO_InitTypeDef led_init = {.Pin = GPIO_PIN_13,
