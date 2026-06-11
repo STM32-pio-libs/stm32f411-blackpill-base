@@ -10,12 +10,15 @@ int main(){
     enable_gpio();
     setup_hardfault_led();
     setup_uart1();
+    setup_spi1();
+    setvbuf(stdout, NULL, _IONBF, 0);
 
-    uint32_t x = 0;
+    char s[100];
 
-    while(1){
-        printf("Hello %ld\n", x++); 
-        HAL_Delay(100);
+    while (1) { 
+        printf("Enter Something: ");
+        scanf("%s", s);
+        printf("You entered: %s\n\r", s);
     }
 
 }

@@ -22,9 +22,23 @@ void enable_gpio(void){
 }
 
 
-int _write(int file, char *ptr, int len)
-{
+int _write(int file, char *ptr, int len){
     HAL_UART_Transmit(&huart1, (uint8_t*)ptr, len, HAL_MAX_DELAY);
+    return len;
+}
+
+int _read(int file, char *ptr, int len){
+    (void)file;
+    for (int i = 0; i < len; i++) {
+        uint8_t ch;
+        HAL_UART_Receive(&huart1, &ch, 1, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&huart1, &ch, 1, HAL_MAX_DELAY);
+        ptr[i] = (char)ch;
+        if (ch == '\r' || ch == '\n') {
+            ptr[i] = '\n';
+            return i + 1;
+        }
+    }
     return len;
 }
 
