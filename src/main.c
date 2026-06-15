@@ -3,6 +3,7 @@
 
 UART_HandleTypeDef huart1;
 SPI_HandleTypeDef spi1;
+I2C_HandleTypeDef i2c1;
 
 int main(){
     HAL_Init();
@@ -11,14 +12,12 @@ int main(){
     setup_hardfault_led();
     setup_uart1();
     setup_spi1();
+    setup_i2c1();
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    char s[100];
+    i2c_scan(&i2c1);
 
-    while (1) { 
-        printf("Enter Something: ");
-        scanf("%s", s);
-        printf("You entered: %s\n\r", s);
+    while (1) {
     }
 
 }

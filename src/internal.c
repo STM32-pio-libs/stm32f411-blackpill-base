@@ -3,6 +3,7 @@
 
 extern UART_HandleTypeDef huart1;
 extern SPI_HandleTypeDef spi1;
+extern I2C_HandleTypeDef i2c1;
 
 void setup_hardfault_led(void){
     GPIO_InitTypeDef led_init = {.Pin = GPIO_PIN_13,
@@ -95,6 +96,51 @@ void setup_spi1(void){
         .CRCCalculation = SPI_CRCCALCULATION_DISABLE, .CRCPolynomial = 7
     };
     if (HAL_SPI_Init(&spi1) != HAL_OK) { Error_Handler(); }
+}
+
+void setup_i2c1(void){
+    /**I2C GPIO Configuration
+    PB6     ------> I2C1_SCL
+    PB7     ------> I2C1_SDA
+    */
+    __HAL_RCC_I2C1_CLK_ENABLE();
+
+    GPIO_InitTypeDef i2c_pin = {
+        .Pin = GPIO_PIN_6 | GPIO_PIN_7,
+        .Mode = GPIO_MODE_AF_OD,
+        .Pull = GPIO_PULLUP,
+        .Speed = GPIO_SPEED_FREQ_VERY_HIGH,
+        .Alternate = GPIO_AF4_I2C1,
+    };
+    HAL_GPIO_Init(GPIOB, &i2c_pin);
+
+    i2c1.Instance = I2C1;
+    i2c1.Init = (I2C_InitTypeDef){
+        .ClockSpeed = 100000,
+        .DutyCycle = I2C_DUTYCYCLE_2,
+        .OwnAddress1 = 0,
+        .AddressingMode = I2C_ADDRESSINGMODE_7BIT,
+        .DualAddressMode = I2C_DUALADDRESS_DISABLE,
+        .OwnAddress2 = 0,
+        .GeneralCallMode = I2C_GENERALCALL_DISABLE,
+        .NoStretchMode = I2C_NOSTRETCH_DISABLE,
+    };
+    if (HAL_I2C_Init(&i2c1) != HAL_OK) { Error_Handler(); }
+}
+
+void i2c_scan(I2C_HandleTypeDef *i2c){
+    printf("I2C scan start\r\n");
+    uint8_t found = 0;
+    for (uint8_t addr = 0x08; addr <= 0x77; addr++) {
+        if (HAL_I2C_Master_Transmit(i2c, (uint16_t)(addr << 1), NULL, 0, 10) == HAL_OK) {
+            printf("  Device at 0x%02X\r\n", addr);
+            found++;
+        }
+    }
+    if (found == 0) {
+        printf("  No devices found\r\n");
+    }
+    printf("I2C scan done (%u device(s))\r\n", found);
 }
 
 void Error_Handler(void){
